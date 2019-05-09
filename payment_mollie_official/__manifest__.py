@@ -43,6 +43,7 @@
         'views/payment_views.xml',
         'views/sale_order.xml',
         'views/payment_templates.xml',
+        'views/payment_acquirer_method_view.xml',
     ],
     'images': ['static/images/main_screenshot.png'],
     'installable': True,

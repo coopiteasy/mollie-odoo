@@ -63,8 +63,7 @@ class SaleOrder(models.Model):
                 if country in method.country_ids:
                     available_list.append(method)
             else:
-                if currency in method.currency_ids and\
-                        country in method.country_ids:
+                if currency in method.currency_ids and country in method.country_ids:
                     available_list.append(method)
         return available_list
 
@@ -261,13 +260,6 @@ class SaleOrder(models.Model):
                 else:
                     self.mollie_orders_delete()
                     response = self.mollie_orders_create(tx_reference)
-                    # It is necessary that mollie allows me to update an order
-#                     if response['amount']['value'] != '%.2f' % float(
-#                             self.amount_total):
-#                         self.mollie_orders_delete()
-#                         response = self.mollie_orders_create(tx_reference)
-#                     else:
-#                         response = self.mollie_orders_update(tx_reference)
             return response
         except Exception as e:
             _logger.info("ERROR! %s" % (e,))

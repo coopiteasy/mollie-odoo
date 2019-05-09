@@ -121,6 +121,7 @@ class AcquirerMollieMethod(models.Model):
     name = fields.Char('Description', index=True,
                        required=True,
                        translate=True)
+    active = fields.Boolean(string='Active', default=True)
     sequence = fields.Integer(
         'Sequence', default=1,
         help='Gives the sequence order when displaying a method list')
@@ -140,6 +141,28 @@ class AcquirerMollieMethod(models.Model):
     country_ids = fields.Many2many('res.country',
                                    string='specific Countries')
 
+    """
+        By default the Mollie app will show the payment methods to the end user in the shop depending on the payment
+        icons, not the payment acquirer method as you might believe.
+        This override will archive/activate all related payment icons so that the shop payment methods
+        show itself correctly too.
+    """
+    @api.multi
+    def toggle_active(self):
+        """ Inverse the value of the field ``active`` on the records in ``self``. """
+        for record in self:
+            # Archive or dearchive the payment acquirer method
+            record.active = not record.active
+
+            # Find the related payment icons and archive or dearchive them too
+            related_payment_icons = self.env['payment.icon'].search([('provider', '=', 'mollie'),
+                                                                     ('name', '=', record.name)])
+
+            for related_payment_icon in related_payment_icons:
+                related_payment_icon.write({
+                    'active': record.active
+                })
+
 
 class AcquirerMollie(models.Model):
     _inherit = 'payment.acquirer'
@@ -156,18 +179,6 @@ class AcquirerMollie(models.Model):
     dashboard_url = fields.Char(string="Dashboard URL")
     method_ids = fields.One2many('payment.acquirer.method',
                                  'acquirer_id', 'Supported methods')
-
-#     @api.multi
-#     @api.constrains('provider')
-#     def _check_reconcile(self):
-#         for rec in self:
-#             if rec.provider == 'mollie':
-#                 already_exist = self._get_main_mollie_provider()
-#                 if already_exist:
-#                     raise ValidationError(
-#                         _("Sorry you can not create many Mollie acquirer.\n"
-#                             "You can configure the payment methods"
-#                             " for the one that already exists"))
 
     @api.model
     def _get_main_mollie_provider(self):
@@ -281,6 +292,7 @@ class AcquirerMollie(models.Model):
                 continue
             mollie_api_key = self._get_mollie_api_keys(
                 self.environment)['mollie_api_key']
+
             acquirer.method_ids.unlink()
             try:
                 self._mollie_client.set_api_key(mollie_api_key)

@@ -23,5 +23,4 @@ from . import mollie
 from . import provider_log
 from . import res_partner
 from . import sale_order
-
-
+from . import payment_icon

@@ -5,6 +5,15 @@
         <field name="model">payment.icon</field>
         <field name="inherit_id" ref="payment.payment_icon_form_view"/>
         <field name="arch" type="xml">
+            <xpath expr="//field" position="before">
+
+                <!-- Header smart buttons -->
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options="{'terminology': 'archive'}"/>
+                        </button>
+                    </div>
+            </xpath>
             <xpath expr='//notebook' position='before'>
                 <group>
                     <field name="sequence" readonly="1"/>
@@ -38,16 +47,34 @@
                 <field name="acquirer_reference" readonly="1"/>
                 <field name="minimum_amount"/>
                 <field name="maximum_amount"/>
+                <field name="active"/>
+                <!--
                 <field name="currency_ids"  widget="many2many_tags"/>
                 <field name="country_ids"  widget="many2many_tags"/>
+                -->
             </tree>
         </field>
     </record>
+
+    <record id="payment_icon_search_view" model="ir.ui.view">
+        <field name="name">payment.icon.search</field>
+        <field name="model">payment.icon</field>
+        <field name="arch" type="xml">
+            <search string="Payment icons">
+                <field name="name"/>
+                <group expand="0" string="Group By">
+                    <filter string="Active" name="active" context="{'group_by':'active'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
     <record id="mollie_gateways_action" model="ir.actions.act_window">
 	     <field name="name">Gateways</field>
 	     <field name="res_model">payment.icon</field>
 	     <field name="view_type">form</field>
 	     <field name="view_id" ref="payment_icon_tree_view"/>
+         <field name="context">{'active_test': False}</field>
 	     <field name="domain">[('provider','=','mollie')]</field>
 	 </record>
 	    
@@ -103,7 +130,7 @@
                 </group>
                 <group>
 
-                  <field name="method_ids" nolabel="1" attrs="{'invisible': [('provider', '!=', 'mollie')]}">
+                  <field name="method_ids" nolabel="1" attrs="{'invisible': [('provider', '!=', 'mollie')]}" context="{'active_test': False}">
                    <tree string="Supported method" create="false">
                       <field name="sequence" widget="handle"/>
                       <field name="image_small" widget="image" class="oe_avatar" nolabel="1" readonly="1"/>
@@ -111,7 +138,7 @@
                       <field name="currency_ids"  widget="many2many_tags" invisible="1"/>
                       <field name="country_ids"  widget="many2many_tags" invisible="1"/>
                       <field name="acquirer_reference" readonly="1"/>
-                      <field name="acquirer_id" invisible="1"/>
+                      <field name="active"/>
                    </tree>
                   </field>
                 </group>
