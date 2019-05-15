@@ -12,6 +12,7 @@
     <template id="assets_backend" name="account assets" inherit_id="web.assets_backend">
         <xpath expr="." position="inside">
             <link rel="stylesheet" type="text/css" href="/payment_mollie_official/static/src/css/payment_mollie_official.css"/>
+            <script type="text/javascript" src="/payment_mollie_official/static/src/js/tour.js"></script>
         </xpath>
     </template>
     
