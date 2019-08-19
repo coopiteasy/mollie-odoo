@@ -138,7 +138,7 @@
                       <field name="currency_ids"  widget="many2many_tags" invisible="1"/>
                       <field name="country_ids"  widget="many2many_tags" invisible="1"/>
                       <field name="acquirer_reference" readonly="1"/>
-                      <field name="active"/>
+                      <field name="active" string="Active on website"/>
                    </tree>
                   </field>
                 </group>
