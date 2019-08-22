@@ -42,8 +42,8 @@ class AcquirerMollie(models.Model):
                 return {'warning': {'title': "Warning", 'message': "Value of Live API Key is not valid. Should begin with 'live_'",}}
 
     def _get_mollie_api_keys(self, environment):
-        keys = {'prod': self.mollie_api_key_prod,
-                'test': self.mollie_api_key_test
+        keys = {'prod': self.sudo().mollie_api_key_prod,
+                'test': self.sudo().mollie_api_key_test
                 }
         return {'mollie_api_key': keys.get(environment, keys['test']), }
 
@@ -102,7 +102,7 @@ class AcquirerMollie(models.Model):
 class TxMollie(models.Model):
     _inherit = 'payment.transaction'
 
-    @api.multi
+    @api.model
     def _mollie_form_get_tx_from_data(self, data):
         reference = data.get('reference')
         payment_tx = self.search([('reference', '=', reference)])
@@ -118,19 +118,17 @@ class TxMollie(models.Model):
 
         return payment_tx
 
-    @api.multi
-    def _mollie_form_get_invalid_parameters(self, data):
+    @api.model
+    def _mollie_form_get_invalid_parameters(self, tx, data):
         invalid_parameters = []
 
         return invalid_parameters
 
-    @api.multi
-    def _mollie_form_validate(self, data):
+    @api.model
+    def _mollie_form_validate(self, tx, data):
         reference = data.get('reference')
 
-        acquirer = self.acquirer_id
-
-        tx = self._mollie_form_get_tx_from_data(data)
+        acquirer = tx.acquirer_id
 
         transactionId = tx['acquirer_reference']
 
