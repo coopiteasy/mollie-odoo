@@ -86,7 +86,7 @@ class MollieController(http.Controller):
         mollie_response = requests.post(
             url, data=json.dumps(payload), headers=headers).json()
 
-        if mollie_response["status"] == "open":
+        if mollie_response.get("status", False) and mollie_response.get("status") == "open":
 
             payment_tx = request.env['payment.transaction'].sudo().search([('reference', '=', orderid)])
             if not payment_tx or len(payment_tx) > 1:
