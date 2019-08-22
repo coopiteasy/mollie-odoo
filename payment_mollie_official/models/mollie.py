@@ -8,20 +8,24 @@ import unicodedata
 import pprint
 import requests
 
-from odoo import models, fields, api
-from odoo.tools.float_utils import float_compare
-from odoo.tools.translate import _
-from odoo.addons.payment.models.payment_acquirer import ValidationError
-from odoo.tools.safe_eval import safe_eval
+from openerp import models, fields, api
+from openerp.tools.float_utils import float_compare
+from openerp.tools.translate import _
+from openerp.addons.payment.models.payment_acquirer import ValidationError
+from openerp.tools.safe_eval import safe_eval
 
 _logger = logging.getLogger(__name__)
 
 
 class AcquirerMollie(models.Model):
     _inherit = 'payment.acquirer'
-    # Fields
 
-    provider = fields.Selection(selection_add=[('mollie', 'Mollie')])
+    @api.model
+    def _get_providers(self):
+        providers = super(AcquirerMollie, self)._get_providers()
+        providers.append(['mollie', 'Mollie'])
+        return providers
+    
     mollie_api_key_test = fields.Char('Mollie Test API key', size=40, required_if_provider='mollie', groups='base.group_user')
     mollie_api_key_prod = fields.Char('Mollie Live API key', size=40, required_if_provider='mollie', groups='base.group_user')
 
