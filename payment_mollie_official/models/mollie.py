@@ -170,24 +170,24 @@ class TxMollie(models.Model):
                 'acquirer_reference': mollie_reference,
             }
 
-            self.write(vals)
-            if self.callback_eval:
-                safe_eval(self.callback_eval, {'self': self})
+            tx.write(vals)
+            if tx.callback_eval:
+                safe_eval(tx.callback_eval, {'self': tx})
             return True
         elif status in ["cancelled", "expired", "failed"]:
-            self.write({
+            tx.write({
                 'state': 'cancel',
                 'acquirer_reference': mollie_reference,
             })
             return False
         elif status in ["open", "pending"]:
-            self.write({
+            tx.write({
                 'state': 'pending',
                 'acquirer_reference': mollie_reference,
             })
             return False
         else:
-            self.write({
+            tx.write({
                 'state': 'error',
                 'acquirer_reference': mollie_reference,
             })
