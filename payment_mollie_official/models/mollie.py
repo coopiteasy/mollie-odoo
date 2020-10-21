@@ -192,7 +192,3 @@ class TxMollie(models.Model):
                 'acquirer_reference': mollie_reference,
             })
             return False
-
-
-
-
