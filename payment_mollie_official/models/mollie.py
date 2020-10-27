@@ -23,7 +23,7 @@ class AcquirerMollie(models.Model):
     @api.model
     def _get_providers(self):
         providers = super(AcquirerMollie, self)._get_providers()
-        providers.append(['mollie', 'Mollie'])
+        providers.append(['mollie_official', 'Mollie'])
         return providers
     
     mollie_api_key_test = fields.Char('Mollie Test API key', size=40, required_if_provider='mollie', groups='base.group_user')

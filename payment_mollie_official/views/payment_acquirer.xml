@@ -8,7 +8,7 @@
             <field name="inherit_id" ref="payment.acquirer_form"/>
             <field name="arch" type="xml">
                 <xpath expr='//group[@name="acquirer"]' position='after'>
-                    <group attrs="{'invisible': [('provider', '!=', 'mollie')]}">
+                    <group attrs="{'invisible': [('provider', '!=', 'mollie_official')]}">
                         <field name="mollie_api_key_test"/>
                         <field name="mollie_api_key_prod"/>
                     </group>
