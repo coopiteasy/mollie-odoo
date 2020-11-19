@@ -4,8 +4,8 @@
 
         <record id="payment.payment_acquirer_mollie" model="payment.acquirer">
             <field name="name">Online payment (Mollie)</field>
-            <field name="image" type="base64" file="payment_mollie_official/static/src/img/mollie_icon.png"/>
-            <field name="provider">mollie</field>
+            <field name="image" type="base64" file="payment_mollie_official/static/src/img/mollie_official_icon.png"/>
+            <field name="provider">mollie_official</field>
             <field name="company_id" ref="base.main_company"/>
             <field name="view_template_id" ref="payment_mollie_official.mollie_acquirer_button"/>
             <field name="environment">test</field>
