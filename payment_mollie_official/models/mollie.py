@@ -56,7 +56,7 @@ class AcquirerMollie(models.Model):
         return {'mollie_form_url': url.get(environment, url['test']), }
 
     @api.multi
-    def mollie_form_generate_values(self, values):
+    def mollie_official_form_generate_values(self, values):
         self.ensure_one()
         base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
         currency = self.env['res.currency'].sudo().browse(values['currency_id'])
@@ -94,7 +94,7 @@ class AcquirerMollie(models.Model):
         return mollie_tx_values
 
     @api.multi
-    def mollie_get_form_action_url(self):
+    def mollie_official_get_form_action_url(self):
         self.ensure_one()
         return "/payment/mollie/intermediate"
 
@@ -103,7 +103,7 @@ class TxMollie(models.Model):
     _inherit = 'payment.transaction'
 
     @api.model
-    def _mollie_form_get_tx_from_data(self, data):
+    def _mollie_official_form_get_tx_from_data(self, data):
         reference = data.get('reference')
         payment_tx = self.search([('reference', '=', reference)])
 
@@ -119,13 +119,13 @@ class TxMollie(models.Model):
         return payment_tx
 
     @api.model
-    def _mollie_form_get_invalid_parameters(self, tx, data):
+    def _mollie_official_form_get_invalid_parameters(self, tx, data):
         invalid_parameters = []
 
         return invalid_parameters
 
     @api.model
-    def _mollie_form_validate(self, tx, data):
+    def _mollie_official_form_validate(self, tx, data):
         reference = data.get('reference')
 
         acquirer = tx.acquirer_id
