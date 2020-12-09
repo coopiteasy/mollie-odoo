@@ -7,9 +7,9 @@ import werkzeug
 import pprint
 
 
-from odoo import http, SUPERUSER_ID
-from odoo.http import request
-from odoo.addons.payment.models.payment_acquirer import ValidationError
+from openerp import http, SUPERUSER_ID
+from openerp.http import request
+from openerp.addons.payment.models.payment_acquirer import ValidationError
 
 _logger = logging.getLogger(__name__)
 
@@ -86,7 +86,7 @@ class MollieController(http.Controller):
         mollie_response = requests.post(
             url, data=json.dumps(payload), headers=headers).json()
 
-        if mollie_response["status"] == "open":
+        if mollie_response.get("status", False) and mollie_response.get("status") == "open":
 
             payment_tx = request.env['payment.transaction'].sudo().search([('reference', '=', orderid)])
             if not payment_tx or len(payment_tx) > 1:

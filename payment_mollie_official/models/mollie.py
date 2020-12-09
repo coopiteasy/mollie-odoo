@@ -8,20 +8,24 @@ import unicodedata
 import pprint
 import requests
 
-from odoo import models, fields, api
-from odoo.tools.float_utils import float_compare
-from odoo.tools.translate import _
-from odoo.addons.payment.models.payment_acquirer import ValidationError
-from odoo.tools.safe_eval import safe_eval
+from openerp import models, fields, api
+from openerp.tools.float_utils import float_compare
+from openerp.tools.translate import _
+from openerp.addons.payment.models.payment_acquirer import ValidationError
+from openerp.tools.safe_eval import safe_eval
 
 _logger = logging.getLogger(__name__)
 
 
 class AcquirerMollie(models.Model):
     _inherit = 'payment.acquirer'
-    # Fields
 
-    provider = fields.Selection(selection_add=[('mollie', 'Mollie')])
+    @api.model
+    def _get_providers(self):
+        providers = super(AcquirerMollie, self)._get_providers()
+        providers.append(['mollie', 'Mollie'])
+        return providers
+    
     mollie_api_key_test = fields.Char('Mollie Test API key', size=40, required_if_provider='mollie', groups='base.group_user')
     mollie_api_key_prod = fields.Char('Mollie Live API key', size=40, required_if_provider='mollie', groups='base.group_user')
 
@@ -38,8 +42,8 @@ class AcquirerMollie(models.Model):
                 return {'warning': {'title': "Warning", 'message': "Value of Live API Key is not valid. Should begin with 'live_'",}}
 
     def _get_mollie_api_keys(self, environment):
-        keys = {'prod': self.mollie_api_key_prod,
-                'test': self.mollie_api_key_test
+        keys = {'prod': self.sudo().mollie_api_key_prod,
+                'test': self.sudo().mollie_api_key_test
                 }
         return {'mollie_api_key': keys.get(environment, keys['test']), }
 
@@ -98,7 +102,7 @@ class AcquirerMollie(models.Model):
 class TxMollie(models.Model):
     _inherit = 'payment.transaction'
 
-    @api.multi
+    @api.model
     def _mollie_form_get_tx_from_data(self, data):
         reference = data.get('reference')
         payment_tx = self.search([('reference', '=', reference)])
@@ -114,19 +118,17 @@ class TxMollie(models.Model):
 
         return payment_tx
 
-    @api.multi
-    def _mollie_form_get_invalid_parameters(self, data):
+    @api.model
+    def _mollie_form_get_invalid_parameters(self, tx, data):
         invalid_parameters = []
 
         return invalid_parameters
 
-    @api.multi
-    def _mollie_form_validate(self, data):
+    @api.model
+    def _mollie_form_validate(self, tx, data):
         reference = data.get('reference')
 
-        acquirer = self.acquirer_id
-
-        tx = self._mollie_form_get_tx_from_data(data)
+        acquirer = tx.acquirer_id
 
         transactionId = tx['acquirer_reference']
 
@@ -168,24 +170,24 @@ class TxMollie(models.Model):
                 'acquirer_reference': mollie_reference,
             }
 
-            self.write(vals)
-            if self.callback_eval:
-                safe_eval(self.callback_eval, {'self': self})
+            tx.write(vals)
+            if tx.callback_eval:
+                safe_eval(tx.callback_eval, {'self': tx})
             return True
         elif status in ["cancelled", "expired", "failed"]:
-            self.write({
+            tx.write({
                 'state': 'cancel',
                 'acquirer_reference': mollie_reference,
             })
             return False
         elif status in ["open", "pending"]:
-            self.write({
+            tx.write({
                 'state': 'pending',
                 'acquirer_reference': mollie_reference,
             })
             return False
         else:
-            self.write({
+            tx.write({
                 'state': 'error',
                 'acquirer_reference': mollie_reference,
             })

@@ -1,0 +1,12 @@
+<odoo>
+	<template id="payment_template_mollie" inherit_id="website_sale.payment" name="payment_provider_mollie">
+        <xpath expr="//img[@class='media-object']" position="replace">
+        	<img t-if="acquirer.image_small" class="media-object" style="width: 60px; display: inline-block;"
+                 t-att-title="acquirer.name"
+                 t-att-src="'data:image/png;base64,%s' % acquirer.image_small"/>
+           	<img t-if="not acquirer.image_small" class="media-object" style="width: 60px; display: inline-block;"
+                 t-att-title="acquirer.name"
+                 t-att-src="'/payment_%s/static/src/img/%s_icon.png' % (acquirer.provider, acquirer.provider)"/>
+        </xpath>
+	</template>
+</odoo>
