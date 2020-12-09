@@ -10,6 +10,7 @@
     'data': [
         'views/mollie.xml',
         'views/payment_acquirer.xml',
+        'views/template.xml',
         'data/mollie.xml',
     ],
     'installable': True,
