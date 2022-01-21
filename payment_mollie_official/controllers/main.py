@@ -31,7 +31,21 @@ class MollieController(http.Controller):
         '/payment/mollie/redirect'], type='http', auth="none", methods=['GET'])
     def mollie_redirect(self, **post):
         cr, uid, context = request.cr, SUPERUSER_ID, request.context
-        request.env['payment.transaction'].sudo().form_feedback(post, 'mollie')
+        try:
+            request.env["payment.transaction"].sudo().form_feedback(post, "mollie")
+        # VERY TEMPORARY UGLY WORKAROUND
+        #
+        # _mollie_form_validate() almost assuredly throws a KeyError on
+        # `data_list = mollie_response["data"]`. When that happens, the user is
+        # shown a big internal server error page, even though Mollie (probably)
+        # correctly handled their payment.
+        #
+        # Unfortunately, the user is redirected to the home page instead of
+        # `/shop/payment/validate` for reasons unknown to me, without
+        # verification that their payment succeeded. But it's better than the
+        # big error page.
+        except KeyError as error:
+            _logger.exception(error)
         return werkzeug.utils.redirect("/shop/payment/validate")
 
     @http.route([
